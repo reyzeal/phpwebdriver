@@ -294,11 +294,12 @@
                     $env = file_get_contents(__DIR__."/../instances/$i/.env");
                     preg_match_all("(WA_PASSWORD=[^\n]+)",$env,$pass);
                     $pass = $pass[0][0];
+                    $pass = str_replace("'",'',str_replace("WA_PASSWORD=","",$pass));
                     ?>
                 <tr>
                     <td><?= ++$c ?></td>
                     <td><?= $i ?></td>
-                    <td><?= str_replace("'",'',str_replace("WA_PASSWORD=","",$pass)) ?></td>
+                    <td><?= $pass ?></td>
                     <td>
                         <a href="instances/<?=$i?>" class="btn btn-success">>> Open</a>
                         <button data-target="#delete" data-toggle="modal" onclick="setUUID('<?=$i?>')" class="btn btn-warning">! Destroy</button>

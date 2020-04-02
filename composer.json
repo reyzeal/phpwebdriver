@@ -2,6 +2,8 @@
     "require": {
         "php-webdriver/webdriver": "^1.8",
         "nesbot/carbon": "^2.32",
-        "vlucas/phpdotenv": "^4.1"
+        "vlucas/phpdotenv": "^4.1",
+        "ext-json": "^1.7",
+        "ext-curl": "^7.3"
     }
 }
