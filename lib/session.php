@@ -19,36 +19,41 @@ function Session($data = null){
 /**
  * @return RemoteWebDriver
  */
-function SessionWeb($target = null){
+function SessionWeb($target = null, $userdir = 'tmp_files'){
     $host = 'http://localhost:4444'; // this is the default
     $sessions = RemoteWebDriver::getAllSessions($host);
 
     $session = null;
     try{
         if(!$session)
-            $session = file_get_contents("session");
+            $session = file_get_contents(__DIR__."/../session");
         else
             $session = $target;
     }
     catch (Exception $e){
 
     }
+    $sid = null;
     foreach ($sessions as $i){
         if($i['id'] == $session) $sid = $i;
     }
-    if($sid){
+    if($sid && strlen($session) > 0){
         $driver = RemoteWebDriver::createBySessionID($session, $host);
-    }else{
-        $userdir = getenv('WA_USERDIR');
+    }
+    else{
+        if(getenv('WA_ROLE') != 'panel')
+            $userdir = getenv('WA_USERDIR');
         $options = new ChromeOptions();
+        $options->addExtensions([__DIR__.'/../dcsp.zip']);
         $options->addArguments(["--user-data-dir=$userdir"]);
         $caps = DesiredCapabilities::chrome();
         $caps->setCapability(ChromeOptions::CAPABILITY,$options);
         $driver = RemoteWebDriver::create($host, $caps);
     }
-    file_put_contents("session",$driver->getSessionID());
+    file_put_contents(__DIR__."/../session",$driver->getSessionID());
     try{
-        $driver->executeScript("document.querySelector('._1WZqU.PNlAR').click();");
+        if(strpos($driver->getTitle(),"WhatsApp"))
+            $driver->executeScript("document.querySelector('._1WZqU.PNlAR').click();");
     }
     catch (Exception $e){
     }

@@ -8,14 +8,15 @@ require __DIR__."/lib/session.php";
 require __DIR__."/lib/core.php";
 use Carbon\Carbon;
 $role = getenv('WA_ROLE');
+$addon = $role == 'panel'?'':'/instances/'.getenv('WA_USERNAME').'/';
 if($_SERVER['REQUEST_METHOD'] == 'GET'){
     $page = isset($_GET['p'])?$_GET['p']:'index';
 
     if(!Session() && $page != 'login') {
-        header('Location: index.php?p=login');
+        header("Location: ".$addon."index.php?p=login");
         exit();
     }elseif($role != 'panel' && Session() && Session()['scan'] && ($page != 'scan' && $page != 'getImg')){
-        header('Location: index.php?p=scan');
+        header("Location: ".$addon."index.php?p=scan");
         exit();
     }
     switch ($page){
@@ -23,9 +24,9 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
             include "templates/login.php";
             break;
         case 'logout':
-            session_destroy();
+            unset($_SESSION[getenv('WA_USERNAME')]);
             Logout();
-            header('Location: index.php');
+            header("Location: ".$addon."index.php");
             exit();
             break;
         case "scan":
@@ -62,29 +63,38 @@ if($_SERVER['REQUEST_METHOD'] == 'GET'){
 else{
     $page = isset($_GET['p'])?$_GET['p']:'index';
     if(!Session() && $page != 'login'){
-        header('Location: index.php?p=login');
+        header("Location: ".$addon."index.php?p=login");
         exit();
     }
     switch ($page){
         case 'login':
             try{
                 if($_POST['username'] == getenv('WA_USERNAME') && $_POST['password'] == getenv('WA_PASSWORD')){
-                    Session([
-                        'username' => getenv('WA_USERNAME'),
-                        "timeout" => Carbon::now()->addHours(24),
-                        "session" => uniqid(),
-                        "scan" => null
-                    ]);
-                    header('Location: index.php');
+                    if($role == 'panel')
+                        Session([
+                            'username' => getenv('WA_USERNAME'),
+                            "timeout" => Carbon::now()->addHours(24),
+                            "session" => uniqid(),
+                            "scan" => null
+                        ]);
+                    else{
+                        Session([
+                            'username' => getenv('WA_USERNAME'),
+                            "timeout" => Carbon::now()->addHours(24),
+                            "session" => generate(),
+                            "scan" => getImg()
+                        ]);
+                    }
+                    header("Location: ".$addon."index.php");
                     exit();
                 }else{
-                    header("Location: index.php?p=login");
+                    header("Location: ".$addon."index.php?p=login");
                 }
             }
             catch (Exception $e){
                 die($e);
             }
-//            header('Location: index.php?p=login');
+//            header("Location: ".$addon."index.php?p=login");
             exit();
             break;
         case 'index':
@@ -96,13 +106,13 @@ else{
                 createNewInstance($_POST['password']);
             }
 
-            header("Location: index.php");
+            header("Location: ".$addon."index.php");
             break;
         case 'destroy':
             if($role == 'panel'){
                 destroyInstance($_POST['uuid']);
             }
-            header("Location: index.php");
+            header("Location: ".$addon."index.php");
             break;
         case 'upload':
             try{
@@ -150,7 +160,7 @@ else{
             }catch (Exception $e){
                 die($e);
             }
-            header("Location: index.php");
+            header("Location: ".$addon."index.php");
             break;
         case 'download':
             break;

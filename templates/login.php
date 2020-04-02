@@ -277,7 +277,7 @@
             <h3 class="text-center pt-3">Login</h3>
             <!-- Login Form -->
             <form method="post">
-                <input type="text" id="login" class="fadeIn second" name="username" placeholder="unique identifier">
+                <input type="text" id="login" value="<?=getenv('WA_ROLE')=='worker'?getenv('WA_USERNAME'):''?>" class="fadeIn second" name="username" placeholder="unique identifier">
                 <input type="password" id="password" class="fadeIn third" name="password" placeholder="password">
                 <input type="submit" class="fadeIn fourth" value="Log In">
             </form>

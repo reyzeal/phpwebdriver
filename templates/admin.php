@@ -54,7 +54,7 @@
             background: #fff;
             padding: 30px;
             width: 90%;
-            max-width: 450px;
+            max-width: 650px;
             position: relative;
             padding: 0px;
             -webkit-box-shadow: 0 30px 60px 0 rgba(0,0,0,0.3);
@@ -298,9 +298,11 @@
                 <tr>
                     <td><?= ++$c ?></td>
                     <td><?= $i ?></td>
-                    <td><?= str_replace("WA_PASSWORD=","",$pass) ?></td>
+                    <td><?= str_replace("'",'',str_replace("WA_PASSWORD=","",$pass)) ?></td>
                     <td>
+                        <a href="instances/<?=$i?>" class="btn btn-success">>> Open</a>
                         <button data-target="#delete" data-toggle="modal" onclick="setUUID('<?=$i?>')" class="btn btn-warning">! Destroy</button>
+
                     </td>
                 </tr>
                 <?php }?>

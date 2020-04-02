@@ -97,19 +97,22 @@ function cpy($source, $dest){
 }
 function createNewInstance($password){
     $uuid = uniqid();
-    $DIR = __DIR__.'/..';
+    $DIR = explode(DIRECTORY_SEPARATOR,__DIR__);
+    array_pop($DIR);
+    $DIR = implode(DIRECTORY_SEPARATOR,$DIR);
     $path = $DIR."/instances/$uuid";
-    $path_usr = $DIR."/instances/$uuid/tmp_files";
+    $path_usr = ($DIR."/instances/$uuid/tmp_files");
     mkdir($path);
     mkdir($path."/lib");
     mkdir($path."/tmp_files");
     mkdir($path."/templates");
     mkdir($path."/vendor");
     copy($DIR."/index.php",$path."/index.php");
+    copy($DIR."/dcsp.zip",$path."/dcsp.zip");
     cpy($DIR."/vendor",$path."/vendor");
     cpy($DIR."/lib",$path."/lib");
     cpy($DIR."/templates",$path."/templates");\
-    file_put_contents($path."/.env","WA_USERNAME=$uuid\nWA_PASSWORD=$password\nWA_ROLE=worker\nWA_USERDIR='$path_usr'");
+    file_put_contents($path."/.env","WA_USERNAME=$uuid\nWA_PASSWORD='$password'\nWA_ROLE=worker\nWA_USERDIR='$path_usr'");
     file_put_contents($path."/session","");
 }
 function rmdir_recursive($directory, $delete_parent = null)
@@ -130,10 +133,14 @@ function destroyInstance($uuid){
     $DIR = __DIR__.'/..';
     $path = $DIR."/instances/$uuid";
     try{
-        $session = SessionWeb(file_get_contents($path."/session"));
+        $env = file_get_contents($path."/.env");
+        preg_match_all("(WA_USERDIR=[^\n]+)",$env,$dir);
+        $dir = $dir[0][0];
+        $dir = str_replace("'",'',str_replace("WA_USERDIR=","",$dir));
+        $session = SessionWeb(file_get_contents($path."/session"), $dir);
         $session->close();
     }catch (Exception $e){
 
     }
-    rmdir_recursive(realpath($path));
+    rmdir_recursive(realpath($path),1);
 }
