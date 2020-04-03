@@ -44,6 +44,7 @@ function getImg()
 }
 function send($n,$m){
     ini_set("max_execution_time",0);
+    $m = urlencode($m);
     $driver = SessionWeb();
     $driver->get("https://api.whatsapp.com/send?phone=$n&text=$m&source=&data=");
     $driver->wait(10, 1000)->until(

@@ -281,6 +281,9 @@
                 Logout
             </a>
         </div>
+        <div>
+            <p>Session-Token : <?= session_id() ?></p>
+        </div>
         <form method="post">
             <input type="text" id="number" class="fadeIn second" name="number" placeholder="number">
             <input type="text" id="message" class="fadeIn third" name="message" placeholder="message">
